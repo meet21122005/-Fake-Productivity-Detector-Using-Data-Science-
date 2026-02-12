@@ -8,26 +8,39 @@ A modern, comprehensive web application that analyzes productivity data using da
 ![React](https://img.shields.io/badge/React-18-61dafb)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6)
 ![Tailwind](https://img.shields.io/badge/Tailwind-4-38bdf8)
+![GitHub stars](https://img.shields.io/github/stars/meet21122005/-Fake-Productivity-Detector-Using-Data-Science-?style=social)
+![GitHub forks](https://img.shields.io/github/forks/meet21122005/-Fake-Productivity-Detector-Using-Data-Science-?style=social)
+![GitHub issues](https://img.shields.io/github/issues/meet21122005/-Fake-Productivity-Detector-Using-Data-Science-)
+![License](https://img.shields.io/github/license/meet21122005/-Fake-Productivity-Detector-Using-Data-Science-)
 
 ---
 
 ## ✨ Features
 
 ### 🎯 Core Functionality
-- **Dual Input Methods:** Manual entry & CSV batch upload
-- **Smart Algorithm:** Weighted scoring system (0-100)
-- **Category Classification:** Highly/Moderately/Fake Productive
-- **Personalized Suggestions:** AI-powered improvement recommendations
-- **Data Persistence:** Supabase backend integration
-- **Export Capabilities:** Download reports as CSV
+- **Dual Input Methods:** Manual entry & CSV batch upload with drag & drop
+- **Smart Algorithm:** Weighted scoring system (0-100) with rule-based classification
+- **Machine Learning Integration:** Optional ML model (Random Forest) for enhanced detection
+- **Category Classification:** Highly/Moderately/Fake Productive with detailed breakdowns
+- **Personalized Suggestions:** AI-powered improvement recommendations based on analysis
+- **Data Persistence:** Supabase backend integration with PostgreSQL
+- **Export Capabilities:** Download reports and data as CSV
+- **Data Preprocessing:** Automated cleaning, validation, and normalization
+- **Comprehensive Reporting:** Filterable tables with search and export functionality
+- **User Authentication:** Mock login system with profile management
+- **Health Monitoring:** API health checks and comprehensive logging
 
 ### 🎨 User Interface
-- **Glassmorphism Design:** Modern frosted glass effects
-- **Animated Sidebar:** Smooth navigation with 6 pages
-- **Interactive Charts:** Pie, Bar, and Line graphs
-- **Responsive Layout:** Mobile, tablet, and desktop support
-- **Smooth Animations:** Motion/Framer powered transitions
-- **Loading States:** Professional user feedback
+- **Glassmorphism Design:** Modern frosted glass effects with backdrop blur
+- **Animated Sidebar:** Smooth navigation with 6 main pages and transitions
+- **Interactive Charts:** Pie, Bar, Line, and custom charts using Recharts
+- **Responsive Layout:** Mobile-first design supporting all screen sizes
+- **Smooth Animations:** Motion/React powered transitions and micro-interactions
+- **Loading States:** Professional skeleton loaders and progress indicators
+- **Comprehensive UI Library:** 50+ reusable components (Radix UI + custom)
+- **Drag & Drop Interface:** Intuitive CSV upload with visual feedback
+- **Form Validation:** Real-time validation with error handling
+- **Dark/Light Theme Support:** Theme switching capability (framework ready)
 
 ### 📊 Pages
 
@@ -46,20 +59,36 @@ A modern, comprehensive web application that analyzes productivity data using da
 
 ### Frontend
 ```
-React 18.3.1          - UI framework
-TypeScript 5          - Type safety
-Tailwind CSS 4        - Styling system
-Motion/React 12       - Animations (Framer Motion)
-Recharts 2.15         - Data visualization
-Lucide React 0.487    - Icon library
+React 18.3.1              - UI framework
+TypeScript 5              - Type safety and development
+Vite 6.3.5                - Build tool and dev server
+Tailwind CSS 4            - Utility-first CSS framework
+Motion/React 12           - Animation library
+Recharts 2.15.2           - Data visualization
+Radix UI Components       - Accessible UI primitives
+Lucide React 0.487        - Icon library
+React Hook Form 7.55      - Form management
+React DnD 16              - Drag and drop functionality
+Sonner 2.0.3              - Toast notifications
+Date-fns 3.6              - Date utilities
+Class Variance Authority  - Component styling
 ```
 
 ### Backend
 ```
-Python FastAPI        - Web framework
-Supabase              - Database & Auth
-Pandas & NumPy        - Data processing
-Scikit-learn          - ML classification
+Python 3.11               - Runtime environment
+FastAPI 0.109.2           - Web framework
+Uvicorn 0.27.1            - ASGI server
+Pydantic 2.6.1            - Data validation
+Supabase 2.27.3           - Database & Auth
+Pandas 2.2.0              - Data processing
+NumPy 1.26.4              - Numerical computing
+Scikit-learn 1.4.0        - ML classification
+Joblib 1.3.2              - Model serialization
+HTTPX 0.26.0              - HTTP client
+AIOHTTP 3.9.3             - Async HTTP client
+Python-JOSE 3.3.0         - JWT handling
+Python-Dotenv 1.0.1       - Environment variables
 ```
 
 ---
@@ -89,12 +118,53 @@ score = (taskHours × 8) + (tasksCompleted × 5)
 
 ---
 
+## 🤖 Machine Learning Integration
+
+### ML Model
+- **Algorithm:** Random Forest Classifier
+- **Purpose:** Enhanced productivity classification beyond rule-based scoring
+- **Training Data:** Synthetic productivity datasets
+- **Features:** All 5 input variables + engineered features
+- **Accuracy:** ~85% on test data (academic demonstration)
+
+### Model Training
+```bash
+cd backend
+python -m app.ml.train_model
+```
+
+### Usage
+- Automatically loads if `random_forest_model.joblib` exists
+- Falls back to rule-based scoring if model unavailable
+- Can be toggled in application settings
+
+---
+
 ## 🚀 Getting Started
 
 ### Prerequisites
 ```bash
 Node.js >= 18
 pnpm (recommended) or npm
+Python 3.11
+Git
+```
+
+### Git Setup
+```bash
+# Clone the repository
+git clone https://github.com/meet21122005/-Fake-Productivity-Detector-Using-Data-Science-.git
+cd -Fake-Productivity-Detector-Using-Data-Science-
+
+# Create and switch to development branch (recommended)
+git checkout -b development
+git pull origin development
+
+# For contributors: Fork first, then clone your fork
+# Replace 'yourusername' with your GitHub username
+git clone https://github.com/yourusername/-Fake-Productivity-Detector-Using-Data-Science-.git
+cd -Fake-Productivity-Detector-Using-Data-Science-
+git remote add upstream https://github.com/meet21122005/-Fake-Productivity-Detector-Using-Data-Science-.git
 ```
 
 ### Quick Setup (Recommended)
@@ -108,31 +178,47 @@ setup.bat     # Windows
 ### Manual Installation
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/fake-productivity-detector.git
-cd fake-productivity-detector
+git clone https://github.com/meet21122005/-Fake-Productivity-Detector-Using-Data-Science-.git
+cd -Fake-Productivity-Detector-Using-Data-Science-
 
 # Install frontend dependencies
 npm install
 
 # Set up Python virtual environment
-python -m venv .venv
-.venv\Scripts\activate  # On Windows
-# source .venv/bin/activate  # On macOS/Linux
+python -m venv venv
+venv\Scripts\activate  # On Windows
+# source venv/bin/activate  # On macOS/Linux
 
 # Install backend dependencies
 cd backend
 pip install -r requirements.txt
 
 # Set up environment variables
-copy .env.example .env
+cp .env.example .env
 # Edit .env with your Supabase credentials
 
+# Optional: Train ML model
+python -m app.ml.train_model
+
 # Start the backend (in one terminal)
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+cd ..
+python -m backend.app.main
 
 # Start the frontend (in another terminal)
-cd ..
 npm run dev
+```
+
+### Environment Variables
+```env
+# Supabase Configuration
+SUPABASE_URL=your_supabase_url
+SUPABASE_ANON_KEY=your_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+
+# Application Settings
+DEBUG=true
+LOG_LEVEL=INFO
+CORS_ORIGINS=["http://localhost:5173"]
 ```
 
 ### Build for Production
@@ -220,49 +306,163 @@ Red:      #ef4444    /* Danger */
 ## 📁 Project Structure
 
 ```
-fake-productivity-detector/
+-Fake-Productivity-Detector-Using-Data-Science-/
 ├── src/
+│   ├── main.tsx
 │   ├── app/
-│   │   ├── App.tsx                      # Main application
+│   │   ├── App.tsx                      # Main application component
 │   │   └── components/
-│   │       ├── LoginPage.tsx            # Authentication
-│   │       ├── Sidebar.tsx              # Navigation
-│   │       ├── ActivityInput.tsx        # Input form
-│   │       ├── ProductivityResults.tsx  # Results display
-│   │       ├── ProductivityHistory.tsx  # History component
-│   │       └── pages/
-│   │           ├── DashboardPage.tsx
-│   │           ├── UploadCSVPage.tsx
-│   │           ├── ManualAnalysisPage.tsx
-│   │           ├── ReportsPage.tsx
-│   │           ├── HistoryPage.tsx
-│   │           ├── ProfilePage.tsx
-│   │           └── CSVTemplate.tsx
+│   │       ├── ActivityInput.tsx        # Manual input form
+│   │       ├── Dashboard.tsx            # Dashboard overview
+│   │       ├── LoginPage.tsx            # Authentication page
+│   │       ├── ProductivityHistory.tsx  # History timeline
+│   │       ├── ProductivityResults.tsx  # Analysis results display
+│   │       ├── Sidebar.tsx              # Navigation sidebar
+│   │       ├── figma/
+│   │       │   └── ImageWithFallback.tsx # Figma integration
+│   │       ├── pages/
+│   │       │   ├── CSVTemplate.tsx      # CSV template download
+│   │       │   ├── DashboardPage.tsx    # Dashboard page
+│   │       │   ├── HistoryPage.tsx      # History page
+│   │       │   ├── ManualAnalysisPage.tsx # Manual analysis page
+│   │       │   ├── ProfilePage.tsx      # User profile
+│   │       │   ├── ReportsPage.tsx      # Reports page
+│   │       │   └── UploadCSVPage.tsx    # CSV upload page
+│   │       ├── ui/                      # Reusable UI components
+│   │       │   ├── accordion.tsx
+│   │       │   ├── alert-dialog.tsx
+│   │       │   ├── alert.tsx
+│   │       │   ├── aspect-ratio.tsx
+│   │       │   ├── avatar.tsx
+│   │       │   ├── badge.tsx
+│   │       │   ├── breadcrumb.tsx
+│   │       │   ├── button.tsx
+│   │       │   ├── calendar.tsx
+│   │       │   ├── card.tsx
+│   │       │   ├── carousel.tsx
+│   │       │   ├── chart.tsx
+│   │       │   ├── checkbox.tsx
+│   │       │   ├── collapsible.tsx
+│   │       │   ├── command.tsx
+│   │       │   ├── context-menu.tsx
+│   │       │   ├── dialog.tsx
+│   │       │   ├── drawer.tsx
+│   │       │   ├── dropdown-menu.tsx
+│   │       │   ├── form.tsx
+│   │       │   ├── hover-card.tsx
+│   │       │   ├── input-otp.tsx
+│   │       │   ├── input.tsx
+│   │       │   ├── label.tsx
+│   │       │   ├── menubar.tsx
+│   │       │   ├── navigation-menu.tsx
+│   │       │   ├── pagination.tsx
+│   │       │   ├── popover.tsx
+│   │       │   ├── progress.tsx
+│   │       │   ├── radio-group.tsx
+│   │       │   ├── resizable.tsx
+│   │       │   ├── scroll-area.tsx
+│   │       │   ├── select.tsx
+│   │       │   ├── separator.tsx
+│   │       │   ├── sheet.tsx
+│   │       │   ├── sidebar.tsx
+│   │       │   ├── skeleton.tsx
+│   │       │   ├── slider.tsx
+│   │       │   ├── sonner.tsx
+│   │       │   ├── switch.tsx
+│   │       │   ├── table.tsx
+│   │       │   ├── tabs.tsx
+│   │       │   ├── textarea.tsx
+│   │       │   ├── toggle-group.tsx
+│   │       │   ├── toggle.tsx
+│   │       │   └── tooltip.tsx
+│   │       └── config/
+│   │           └── api.ts                # API configuration
 │   └── styles/
-│       ├── index.css
-│       ├── theme.css
-│       └── fonts.css
-├── README.md
-├── CSV_FORMAT_GUIDE.md
-└── package.json
+│       ├── fonts.css                    # Font definitions
+│       ├── index.css                    # Main styles
+│       ├── tailwind.css                 # Tailwind imports
+│       └── theme.css                    # Theme variables
+├── backend/
+│   ├── README.md                        # Backend documentation
+│   ├── requirements.txt                 # Python dependencies
+│   └── app/
+│       ├── __init__.py
+│       ├── config.py                    # Application configuration
+│       ├── main.py                      # FastAPI app entry point
+│       ├── ml/
+│       │   ├── __init__.py
+│       │   └── train_model.py           # ML model training
+│       ├── models/
+│       │   ├── __init__.py
+│       │   ├── database.py              # Database models
+│       │   └── schemas.py               # Pydantic schemas
+│       ├── routes/
+│       │   ├── __init__.py
+│       │   ├── analysis.py              # Analysis endpoints
+│       │   ├── csv_upload.py            # CSV upload endpoints
+│       │   ├── history.py               # History management
+│       │   └── reports.py               # Reports generation
+│       ├── services/
+│       │   ├── __init__.py
+│       │   ├── ml_model.py              # ML model service
+│       │   ├── preprocessing.py         # Data preprocessing
+│       │   ├── scoring.py               # Scoring algorithm
+│       │   └── suggestions.py           # AI suggestions
+│       └── utils/
+│           ├── __init__.py
+│           └── csv_parser.py            # CSV parsing utilities
+├── index.html                           # Main HTML file
+├── package.json                         # Frontend dependencies
+├── postcss.config.mjs                   # PostCSS configuration
+├── vite.config.ts                       # Vite configuration
+├── ATTRIBUTIONS.md                      # Attributions
+├── CSV_FORMAT_GUIDE.md                  # CSV format guide
+└── README.md                            # This file
 ```
 
 ---
 
 ## 🔌 API Endpoints
 
+### Base URL: `http://localhost:8000/api/v1`
+
 ```typescript
-// Save analysis
-POST /make-server-a0c5b0f2/save-analysis
-Body: { userId, userName, score, category, breakdown, timestamp }
+// Health Check
+GET  /                    - API status and welcome message
+GET  /health              - Health check endpoint
 
-// Get history
-GET /make-server-a0c5b0f2/history/:userId
-Returns: { history: AnalysisEntry[] }
+// Analysis
+POST /analysis/single     - Analyze single productivity entry
+Body: { taskHours, idleHours, socialMediaHours, breakFrequency, tasksCompleted }
 
-// Delete history
-DELETE /make-server-a0c5b0f2/history/:userId
-Returns: { success: boolean, message: string }
+// CSV Upload
+POST /csv-upload          - Upload and process CSV file
+Body: FormData with CSV file
+
+// History
+GET  /history/:userId     - Get user analysis history
+DELETE /history/:userId   - Clear user history
+
+// Reports
+GET  /reports/:userId     - Get user reports with filtering
+POST /reports/export      - Export reports as CSV
+```
+
+### Response Format
+```json
+{
+  "score": 75,
+  "category": "Moderately Productive",
+  "breakdown": {
+    "taskHours": 8,
+    "idleHours": 1,
+    "socialMediaHours": 0.5,
+    "breakFrequency": 3,
+    "tasksCompleted": 10
+  },
+  "suggestions": ["Reduce idle time", "Increase task completion"],
+  "timestamp": "2024-01-15T10:30:00Z"
+}
 ```
 
 ---
@@ -316,11 +516,39 @@ Returns: { success: boolean, message: string }
 
 This is an academic project, but contributions are welcome!
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+### Git Workflow
+1. **Fork** the repository on GitHub
+2. **Clone** your fork locally:
+   ```bash
+   git clone https://github.com/yourusername/-Fake-Productivity-Detector-Using-Data-Science-.git
+   cd -Fake-Productivity-Detector-Using-Data-Science-
+   ```
+3. **Create** a feature branch:
+   ```bash
+   git checkout -b feature/AmazingFeature
+   ```
+4. **Make** your changes and commit:
+   ```bash
+   git add .
+   git commit -m 'Add some AmazingFeature'
+   ```
+5. **Push** to your branch:
+   ```bash
+   git push origin feature/AmazingFeature
+   ```
+6. **Open** a Pull Request on GitHub
+
+### Development Guidelines
+- Follow the existing code style
+- Add tests for new features
+- Update documentation as needed
+- Ensure all tests pass before submitting PR
+
+### Branch Naming Convention
+- `feature/feature-name` - New features
+- `bugfix/bug-description` - Bug fixes
+- `docs/documentation-update` - Documentation changes
+- `refactor/code-improvement` - Code refactoring
 
 ---
 
@@ -357,7 +585,7 @@ This project is for academic purposes. See [LICENSE](LICENSE) file for details.
 
 For questions or issues:
 - 📧 Email: your.email@university.edu
-- 💬 Issues: [GitHub Issues](https://github.com/yourusername/fake-productivity-detector/issues)
+- 💬 Issues: [GitHub Issues](https://github.com/meet21122005/-Fake-Productivity-Detector-Using-Data-Science-/issues)
 
 ---
 
