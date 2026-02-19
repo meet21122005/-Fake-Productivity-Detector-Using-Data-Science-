@@ -123,10 +123,10 @@ async def analyze_productivity(
         suggestions = suggestion_engine.generate_suggestions(
             task_hours=activity.task_hours,
             idle_hours=activity.idle_hours,
-            social_media_hours=activity.social_media_usage,
+            social_media_usage=activity.social_media_usage,
             break_frequency=activity.break_frequency,
             tasks_completed=activity.tasks_completed,
-            productivity_score=scoring_result.score
+            score=scoring_result.score
         )
         
         # Create timestamp
@@ -237,10 +237,10 @@ async def quick_analyze(
         suggestions = suggestion_engine.generate_suggestions(
             task_hours=activity.task_hours,
             idle_hours=activity.idle_hours,
-            social_media_hours=activity.social_media_usage,
+            social_media_usage=activity.social_media_usage,
             break_frequency=activity.break_frequency,
             tasks_completed=activity.tasks_completed,
-            productivity_score=scoring_result.score
+            score=scoring_result.score
         )
         
         return AnalysisResult(

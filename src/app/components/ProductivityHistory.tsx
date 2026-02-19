@@ -88,16 +88,25 @@ export function ProductivityHistory({ userId }: ProductivityHistoryProps) {
   const chartData = history.slice(0, 10).reverse().map((entry) => ({
     date: new Date(entry.timestamp).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
     score: entry.score,
+    userName: entry.userName,
   }));
 
   // Calculate statistics
-  const averageScore = history.length > 0
-    ? Math.round(history.reduce((sum, entry) => sum + entry.score, 0) / history.length)
-    : 0;
+  const validScores = history
+    .map((entry) => entry.score)
+    .filter((score) => typeof score === "number" && !isNaN(score));
 
-  const trend = history.length >= 2
-    ? history[0].score - history[1].score
-    : 0;
+  const averageScore =
+    validScores.length > 0
+      ? Math.round(validScores.reduce((sum, score) => sum + score, 0) / validScores.length)
+      : 0;
+
+  const trend =
+    history.length >= 2 &&
+    typeof history[0].score === "number" &&
+    typeof history[1].score === "number"
+      ? history[0].score - history[1].score
+      : 0;
 
   return (
     <div className="backdrop-blur-lg bg-white/70 border border-white/50 rounded-2xl shadow-xl p-8">
@@ -160,11 +169,17 @@ export function ProductivityHistory({ userId }: ProductivityHistoryProps) {
                   <XAxis dataKey="date" tick={{ fontSize: 12 }} />
                   <YAxis domain={[0, 100]} tick={{ fontSize: 12 }} />
                   <Tooltip
-                    contentStyle={{
-                      backgroundColor: "rgba(255, 255, 255, 0.95)",
-                      border: "1px solid #e5e7eb",
-                      borderRadius: "8px",
-                      boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                    content={({ active, payload }) => {
+                      if (active && payload && payload.length) {
+                        const { score, userName } = payload[0].payload;
+                        return (
+                          <div className="p-2 bg-white rounded shadow text-xs">
+                            <div><strong>User:</strong> {userName}</div>
+                            <div><strong>Score:</strong> {score}</div>
+                          </div>
+                        );
+                      }
+                      return null;
                     }}
                   />
                   <Line
@@ -214,6 +229,7 @@ export function ProductivityHistory({ userId }: ProductivityHistoryProps) {
                       >
                         {entry.category}
                       </span>
+                      <span className="ml-2 text-xs text-gray-500">{entry.userName}</span>
                     </div>
                   </div>
                   <div className="text-2xl">{Math.round(entry.score)}</div>

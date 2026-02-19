@@ -102,6 +102,7 @@ class MLClassifier:
         """
         try:
             model_file = Path(self.model_path)
+            logger.info(f"Attempting to load model from: {model_file.resolve()}")
             if model_file.exists():
                 saved_data = joblib.load(model_file)
                 self.model = saved_data['model']
@@ -113,8 +114,10 @@ class MLClassifier:
                     f"(accuracy: {self.training_accuracy:.2%})"
                 )
                 return True
+            else:
+                logger.warning(f"Model file does not exist at: {model_file.resolve()}")
         except Exception as e:
-            logger.warning(f"Could not load model: {e}")
+            logger.warning(f"Could not load model from {self.model_path}: {e}")
         return False
     
     def _create_model(self, model_type: Optional[str] = None) -> Any:

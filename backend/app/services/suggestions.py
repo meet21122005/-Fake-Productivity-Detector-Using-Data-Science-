@@ -194,10 +194,10 @@ class SuggestionEngine:
         self,
         task_hours: float,
         idle_hours: float,
-        social_media_hours: float,
+        social_media_usage: float,
         break_frequency: int,
         tasks_completed: int,
-        productivity_score: float,
+        score: float,
         max_suggestions: int = 5
     ) -> List[str]:
         """
@@ -206,12 +206,12 @@ class SuggestionEngine:
         Args:
             task_hours: Hours spent on tasks
             idle_hours: Hours spent idle
-            social_media_hours: Hours on social media
+            social_media_usage: Hours on social media
             break_frequency: Number of breaks
             tasks_completed: Number of tasks completed
-            productivity_score: Calculated productivity score
+            score: Calculated productivity score
             max_suggestions: Maximum number of suggestions to return
-            
+        
         Returns:
             List of suggestion strings
         """
@@ -223,12 +223,12 @@ class SuggestionEngine:
         # Check each rule
         metrics = {
             "idle_hours": idle_hours,
-            "social_media_usage": social_media_hours,
+            "social_media_usage": social_media_usage,
             "break_frequency": break_frequency,
             "task_hours": task_hours,
             "tasks_completed": tasks_completed,
             "efficiency_ratio": efficiency_ratio,
-            "score": productivity_score
+            "score": score
         }
         
         for rule in self.rules:
@@ -251,7 +251,7 @@ class SuggestionEngine:
         
         # Add default suggestions if none triggered
         if not unique_suggestions:
-            unique_suggestions = self._get_default_suggestions(productivity_score)
+            unique_suggestions = self._get_default_suggestions(score)
         
         # Limit number of suggestions
         return unique_suggestions[:max_suggestions]

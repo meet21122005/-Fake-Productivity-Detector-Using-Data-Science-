@@ -110,34 +110,41 @@ async def upload_csv(
         
         for i, row_data in enumerate(rows, start=1):
             try:
+                # Only allow expected keys for ML and suggestions
+                allowed_keys = [
+                    'task_hours', 'idle_hours', 'social_media_usage', 'break_frequency', 'tasks_completed'
+                ]
+                filtered_row_data = {k: row_data[k] for k in allowed_keys if k in row_data}
+
                 # Calculate score
                 scoring_result = scorer.calculate_score(
-                    task_hours=row_data['task_hours'],
-                    idle_hours=row_data['idle_hours'],
-                    social_media_hours=row_data['social_media_usage'],
-                    break_frequency=row_data['break_frequency'],
-                    tasks_completed=row_data['tasks_completed']
+                    task_hours=filtered_row_data['task_hours'],
+                    idle_hours=filtered_row_data['idle_hours'],
+                    social_media_hours=filtered_row_data['social_media_usage'],
+                    break_frequency=filtered_row_data['break_frequency'],
+                    tasks_completed=filtered_row_data['tasks_completed']
                 )
-                
+
                 # ML prediction
                 ml_category = None
                 if classifier.is_trained:
                     try:
-                        ml_result = classifier.predict_single(**row_data)
+                        ml_result = classifier.predict_single(**filtered_row_data)
                         ml_category = ml_result['predicted_category']
                     except Exception:
                         pass
-                
-                # Generate suggestions
-                suggestions = suggestion_engine.generate_suggestions(
-                    task_hours=row_data['task_hours'],
-                    idle_hours=row_data['idle_hours'],
-                    social_media_hours=row_data['social_media_usage'],
-                    break_frequency=row_data['break_frequency'],
-                    tasks_completed=row_data['tasks_completed'],
-                    productivity_score=scoring_result.score,
-                    max_suggestions=3
-                )
+
+                # Prepare only allowed arguments for suggestions
+                suggestion_args = {
+                    'task_hours': filtered_row_data.get('task_hours', 0),
+                    'idle_hours': filtered_row_data.get('idle_hours', 0),
+                    'social_media_usage': filtered_row_data.get('social_media_usage', 0),
+                    'break_frequency': filtered_row_data.get('break_frequency', 0),
+                    'tasks_completed': filtered_row_data.get('tasks_completed', 0),
+                    'score': scoring_result.score,
+                    'max_suggestions': 3
+                }
+                suggestions = suggestion_engine.generate_suggestions(**suggestion_args)
                 
                 timestamp = datetime.utcnow().isoformat()
                 
@@ -205,14 +212,21 @@ async def upload_csv(
                 average_score=0,
                 highest_score=0,
                 lowest_score=0,
-                category_distribution={}
+                category_distribution={
+                    "Highly Productive": 0,
+                    "Moderately Productive": 0,
+                    "Fake Productivity": 0
+                },
+                suggestions=suggestion_engine.generate_suggestions(
+                    task_hours=0,
+                    idle_hours=0,
+                    social_media_usage=0,
+                    break_frequency=0,
+                    tasks_completed=0,
+                    score=0,
+                    max_suggestions=3
+                )
             )
-        
-        logger.info(
-            f"CSV processing complete: {len(results)} successful, "
-            f"{len(row_errors)} failed out of {len(rows)} rows"
-        )
-        
         return BatchAnalysisResult(
             total_rows=len(rows),
             successful=len(results),

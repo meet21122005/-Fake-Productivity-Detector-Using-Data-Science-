@@ -15,8 +15,19 @@ from typing import Optional
 
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
-from .config import settings
-from .routes import analysis, csv_upload, history, reports
+from fastapi.responses import JSONResponse
+
+# Ensure absolute package imports work whether running as a package or script.
+import sys
+if __package__ is None:
+    # Running as a script: add parent `backend` directory to sys.path so
+    # `import app.*` works with absolute imports.
+    backend_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    if backend_dir not in sys.path:
+        sys.path.insert(0, backend_dir)
+
+from app.config import settings
+from app.routes import analysis, csv_upload, history, reports
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
@@ -43,6 +54,13 @@ async def lifespan(app: FastAPI):
     model_path = os.path.join(os.path.dirname(__file__), 'ml', 'models', 'random_forest_model.joblib')
     if os.path.exists(model_path):
         logger.info(f"ML Model found: {model_path}")
+        try:
+            from app.services.ml_model import MLClassifier
+            clf = MLClassifier(model_type='random_forest', model_path=model_path)
+            info = clf.get_model_info()
+            logger.info(f"Model Info: Type={info['model_type']}, Trained={info['is_trained']}, Accuracy={info['accuracy']}")
+        except Exception as e:
+            logger.warning(f"Could not load model info: {e}")
     else:
         logger.warning("No pre-trained ML model found. ML predictions will use default model.")
     

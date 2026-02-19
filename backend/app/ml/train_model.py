@@ -94,9 +94,15 @@ def generate_synthetic_data(n_samples: int = 1000, random_state: int = 42) -> pd
     
     for _, row in df.iterrows():
         metrics = row.to_dict()
-        result = scorer.calculate_score(metrics)
-        scores.append(result['score'])
-        categories.append(result['category'])
+        result = scorer.calculate_score(
+            metrics["task_hours"],
+            metrics["idle_hours"],
+            metrics["social_media_usage"] if "social_media_usage" in metrics else metrics.get("social_media_hours", 0),
+            metrics["break_frequency"],
+            metrics["tasks_completed"]
+        )
+        scores.append(result.score)
+        categories.append(result.category)
     
     df['productivity_score'] = scores
     df['category'] = categories
@@ -142,9 +148,15 @@ def load_csv_data(filepath: str) -> pd.DataFrame:
         
         for _, row in df.iterrows():
             metrics = {col: row[col] for col in required_cols}
-            result = scorer.calculate_score(metrics)
-            scores.append(result['score'])
-            categories.append(result['category'])
+            result = scorer.calculate_score(
+                metrics["task_hours"],
+                metrics["idle_hours"],
+                metrics["social_media_usage"] if "social_media_usage" in metrics else metrics.get("social_media_hours", 0),
+                metrics["break_frequency"],
+                metrics["tasks_completed"]
+            )
+            scores.append(result.score)
+            categories.append(result.category)
         
         df['productivity_score'] = scores
         df['category'] = categories
@@ -177,12 +189,12 @@ def train_and_evaluate(
     
     # Preprocess data
     preprocessor = DataPreprocessor()
-    processed_df = preprocessor.preprocess(data)
+    processed_df = preprocessor.clean_data(data)
     
     # Feature columns
     feature_cols = [
         'task_hours', 'tasks_completed', 'idle_hours',
-        'social_media_hours', 'break_frequency'
+        'social_media_usage', 'break_frequency'
     ]
     
     # Prepare features and labels
@@ -244,12 +256,12 @@ def compare_models(data: pd.DataFrame, model_dir: str = 'models') -> dict:
     
     # Preprocess data
     preprocessor = DataPreprocessor()
-    processed_df = preprocessor.preprocess(data)
+    processed_df = preprocessor.clean_data(data)
     
     # Feature columns
     feature_cols = [
         'task_hours', 'tasks_completed', 'idle_hours',
-        'social_media_hours', 'break_frequency'
+        'social_media_usage', 'break_frequency'
     ]
     
     X = processed_df[feature_cols].values

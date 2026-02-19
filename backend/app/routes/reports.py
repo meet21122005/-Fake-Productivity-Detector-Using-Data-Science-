@@ -114,14 +114,18 @@ async def get_user_report(
             'task_hours': analytics.get('avg_task_hours', 0),
             'tasks_completed': analytics.get('avg_tasks_completed', 0),
             'idle_hours': analytics.get('avg_idle_hours', 0),
-            'social_media_hours': analytics.get('avg_social_media_hours', 0),
+            'social_media_usage': analytics.get('avg_social_media_hours', 0),
             'break_frequency': analytics.get('avg_break_frequency', 0),
-            'productivity_score': avg_score
+            'score': avg_score
         }
         
         suggestions = suggestion_engine.generate_suggestions(
-            score=avg_score,
-            metrics=avg_metrics,
+            task_hours=avg_metrics['task_hours'],
+            idle_hours=avg_metrics['idle_hours'],
+            social_media_usage=avg_metrics['social_media_usage'],
+            break_frequency=avg_metrics['break_frequency'],
+            tasks_completed=avg_metrics['tasks_completed'],
+            score=avg_metrics['score'],
             max_suggestions=5
         )
         
@@ -163,7 +167,7 @@ async def get_user_report(
                 "change": trend_change,
                 "daily_data": daily_averages[-14:]  # Last 2 weeks
             },
-            "suggestions": [s.dict() for s in suggestions],
+            "suggestions": suggestions,
             "analytics": analytics
         }
         

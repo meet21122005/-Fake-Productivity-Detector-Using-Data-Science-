@@ -261,12 +261,22 @@ class ProductivityAnalysisDB:
                     "Fake Productivity": 0
                 },
                 "trend": 0,
-                "recent_analyses": []
+                "recent_analyses": [],
+                "avg_task_hours": 0,
+                "avg_tasks_completed": 0,
+                "avg_idle_hours": 0,
+                "avg_social_media_hours": 0,
+                "avg_break_frequency": 0
             }
-        
+
         scores = [h.get("productivity_score", h.get("score", 0)) for h in history]
         categories = [h.get("category_rule_based", h.get("category", "Unknown")) for h in history]
-        
+        task_hours = [h.get("task_hours", 0) for h in history]
+        tasks_completed = [h.get("tasks_completed", 0) for h in history]
+        idle_hours = [h.get("idle_hours", 0) for h in history]
+        social_media_hours = [h.get("social_media_usage", h.get("social_media_hours", 0)) for h in history]
+        break_frequency = [h.get("break_frequency", 0) for h in history]
+
         # Calculate trend (comparing recent vs older)
         if len(scores) >= 2:
             mid = len(scores) // 2
@@ -275,7 +285,10 @@ class ProductivityAnalysisDB:
             trend = recent_avg - older_avg
         else:
             trend = 0
-        
+
+        def safe_avg(lst):
+            return round(sum(lst) / len(lst), 2) if lst and any(x is not None for x in lst) else 0
+
         return {
             "total_analyses": len(history),
             "average_score": round(sum(scores) / len(scores), 2) if scores else 0,
@@ -287,7 +300,12 @@ class ProductivityAnalysisDB:
                 "Fake Productivity": categories.count("Fake Productivity")
             },
             "trend": round(trend, 2),
-            "recent_analyses": history[:10]
+            "recent_analyses": history[:10],
+            "avg_task_hours": safe_avg(task_hours),
+            "avg_tasks_completed": safe_avg(tasks_completed),
+            "avg_idle_hours": safe_avg(idle_hours),
+            "avg_social_media_hours": safe_avg(social_media_hours),
+            "avg_break_frequency": safe_avg(break_frequency)
         }
 
 

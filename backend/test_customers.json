@@ -1,0 +1,35 @@
+[
+  {
+    "user_id": "customer1",
+    "user_name": "Alice Smith",
+    "activity_data": {
+      "task_hours": 7,
+      "idle_hours": 1,
+      "social_media_usage": 1.5,
+      "break_frequency": 4,
+      "tasks_completed": 10
+    }
+  },
+  {
+    "user_id": "customer2",
+    "user_name": "Bob Johnson",
+    "activity_data": {
+      "task_hours": 5,
+      "idle_hours": 2,
+      "social_media_usage": 2.5,
+      "break_frequency": 6,
+      "tasks_completed": 6
+    }
+  },
+  {
+    "user_id": "customer3",
+    "user_name": "Charlie Lee",
+    "activity_data": {
+      "task_hours": 8,
+      "idle_hours": 0.5,
+      "social_media_usage": 1,
+      "break_frequency": 3,
+      "tasks_completed": 12
+    }
+  }
+]

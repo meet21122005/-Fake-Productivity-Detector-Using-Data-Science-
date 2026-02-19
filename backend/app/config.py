@@ -36,11 +36,11 @@ class Settings(BaseSettings):
     
     # Supabase Configuration
     supabase_url: str = Field(
-        default="https://iqdfsevjzfubmshlsxjr.supabase.co",
+        default="https://jvyjzreluiotwngdistw.supabase.co",
         description="Supabase project URL"
     )
     supabase_key: str = Field(
-        default="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlxZGZzZXZqemZ1Ym1zaGxzeGpyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAxODYxNjIsImV4cCI6MjA4NTc2MjE2Mn0.xyM0ZY6H_KDbks0NXnmJ7reuKFhe_4FEFgTkACiZpmo",
+        default="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2eWp6cmVsdWlvdHduZ2Rpc3R3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzMjQwNDMsImV4cCI6MjA4NjkwMDA0M30.mLoKyvm4ckB8N1FbrIf6QPW9_f9h1F_SCcKvg3TNWwY",
         description="Supabase anonymous key"
     )
     supabase_service_key: Optional[str] = Field(
@@ -62,7 +62,7 @@ class Settings(BaseSettings):
     log_level: str = Field(default="INFO", description="Logging level")
     
     # ML Model Paths
-    model_path: str = Field(default="app/ml/model.pkl", description="Path to trained ML model")
+    model_path: str = Field(default="backend/random_forest_model.joblib", description="Path to trained ML model")
     scaler_path: str = Field(default="app/ml/scaler.pkl", description="Path to feature scaler")
     
     # Rate Limiting
