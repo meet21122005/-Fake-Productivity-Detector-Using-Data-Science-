@@ -1,0 +1,43 @@
+# Windows
+copy .env.example .env
+
+
+VITE_API_URL=http://localhost:8000
+VITE_SUPABASE_URL=https://your-project-id.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key
+
+
+# Windows
+copy backend\.env.example backend\.env
+
+
+SUPABASE_URL=https://your-project-id.supabase.co
+SUPABASE_KEY=your-anon-key 
+
+
+
+cd backend
+pip install -r requirements.txt
+uvicorn app.main:app --reload --port 8000
+
+npm install
+npm run dev
+
+
+Quick Summary (after first setup)
+Every time you want to run the project, just open two terminals:
+
+Terminal 1 — Backend:
+cd backend
+uvicorn app.main:app --reload --port 8000
+
+Terminal 2 — Frontend:
+npm run dev
+
+
+If you want to run tests or lint/format code during development:
+cd backend
+pip install -r requirements-dev.txt
+
+For just running the project (production/demo), you only need:
+pip install -r requirements.txt
