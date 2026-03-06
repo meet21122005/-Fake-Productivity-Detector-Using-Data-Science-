@@ -145,7 +145,7 @@ python -m app.ml.train_model
 ### Prerequisites
 ```bash
 Node.js >= 18
-pnpm (recommended) or npm
+npm (comes with Node.js)
 Python 3.11
 Git
 ```
@@ -185,26 +185,23 @@ cd -Fake-Productivity-Detector-Using-Data-Science-
 npm install
 
 # Set up Python virtual environment
-python -m venv venv
-venv\Scripts\activate  # On Windows
-# source venv/bin/activate  # On macOS/Linux
+python -m venv .venv
+.venv\Scripts\activate  # On Windows
+# source .venv/bin/activate  # On macOS/Linux
 
 # Install backend dependencies
 cd backend
 pip install -r requirements.txt
 
-# Set up environment variables
-cp .env.example .env
-# Edit .env with your Supabase credentials
+# Set up environment variables (copy and fill in Supabase credentials)
+copy .env.example .env
+copy backend\.env.example backend\.env
 
-# Optional: Train ML model
-python -m app.ml.train_model
+# Start the backend (Terminal 1)
+cd backend
+uvicorn app.main:app --reload --port 8000
 
-# Start the backend (in one terminal)
-cd ..
-python -m backend.app.main
-
-# Start the frontend (in another terminal)
+# Start the frontend (Terminal 2 — project root)
 npm run dev
 ```
 
@@ -223,7 +220,7 @@ CORS_ORIGINS=["http://localhost:5173"]
 
 ### Build for Production
 ```bash
-pnpm build
+npm run build
 ```
 
 ---
@@ -314,69 +311,19 @@ Red:      #ef4444    /* Danger */
 │   │   └── components/
 │   │       ├── ActivityInput.tsx        # Manual input form
 │   │       ├── Dashboard.tsx            # Dashboard overview
+│   │       ├── ErrorBoundary.tsx        # Error boundary wrapper
 │   │       ├── LoginPage.tsx            # Authentication page
 │   │       ├── ProductivityHistory.tsx  # History timeline
 │   │       ├── ProductivityResults.tsx  # Analysis results display
 │   │       ├── Sidebar.tsx              # Navigation sidebar
-│   │       ├── figma/
-│   │       │   └── ImageWithFallback.tsx # Figma integration
-│   │       ├── pages/
-│   │       │   ├── CSVTemplate.tsx      # CSV template download
-│   │       │   ├── DashboardPage.tsx    # Dashboard page
-│   │       │   ├── HistoryPage.tsx      # History page
-│   │       │   ├── ManualAnalysisPage.tsx # Manual analysis page
-│   │       │   ├── ProfilePage.tsx      # User profile
-│   │       │   ├── ReportsPage.tsx      # Reports page
-│   │       │   └── UploadCSVPage.tsx    # CSV upload page
-│   │       ├── ui/                      # Reusable UI components
-│   │       │   ├── accordion.tsx
-│   │       │   ├── alert-dialog.tsx
-│   │       │   ├── alert.tsx
-│   │       │   ├── aspect-ratio.tsx
-│   │       │   ├── avatar.tsx
-│   │       │   ├── badge.tsx
-│   │       │   ├── breadcrumb.tsx
-│   │       │   ├── button.tsx
-│   │       │   ├── calendar.tsx
-│   │       │   ├── card.tsx
-│   │       │   ├── carousel.tsx
-│   │       │   ├── chart.tsx
-│   │       │   ├── checkbox.tsx
-│   │       │   ├── collapsible.tsx
-│   │       │   ├── command.tsx
-│   │       │   ├── context-menu.tsx
-│   │       │   ├── dialog.tsx
-│   │       │   ├── drawer.tsx
-│   │       │   ├── dropdown-menu.tsx
-│   │       │   ├── form.tsx
-│   │       │   ├── hover-card.tsx
-│   │       │   ├── input-otp.tsx
-│   │       │   ├── input.tsx
-│   │       │   ├── label.tsx
-│   │       │   ├── menubar.tsx
-│   │       │   ├── navigation-menu.tsx
-│   │       │   ├── pagination.tsx
-│   │       │   ├── popover.tsx
-│   │       │   ├── progress.tsx
-│   │       │   ├── radio-group.tsx
-│   │       │   ├── resizable.tsx
-│   │       │   ├── scroll-area.tsx
-│   │       │   ├── select.tsx
-│   │       │   ├── separator.tsx
-│   │       │   ├── sheet.tsx
-│   │       │   ├── sidebar.tsx
-│   │       │   ├── skeleton.tsx
-│   │       │   ├── slider.tsx
-│   │       │   ├── sonner.tsx
-│   │       │   ├── switch.tsx
-│   │       │   ├── table.tsx
-│   │       │   ├── tabs.tsx
-│   │       │   ├── textarea.tsx
-│   │       │   ├── toggle-group.tsx
-│   │       │   ├── toggle.tsx
-│   │       │   └── tooltip.tsx
-│   │       └── config/
-│   │           └── api.ts                # API configuration
+│   │       └── pages/
+│   │           ├── CSVTemplate.tsx      # CSV template download
+│   │           ├── DashboardPage.tsx    # Dashboard page
+│   │           ├── HistoryPage.tsx      # History page
+│   │           ├── ManualAnalysisPage.tsx # Manual analysis page
+│   │           ├── ProfilePage.tsx      # User profile
+│   │           ├── ReportsPage.tsx      # Reports page
+│   │           └── UploadCSVPage.tsx    # CSV upload page
 │   └── styles/
 │       ├── fonts.css                    # Font definitions
 │       ├── index.css                    # Main styles
@@ -385,6 +332,7 @@ Red:      #ef4444    /* Danger */
 ├── backend/
 │   ├── README.md                        # Backend documentation
 │   ├── requirements.txt                 # Python dependencies
+│   ├── requirements-dev.txt             # Dev/testing dependencies
 │   └── app/
 │       ├── __init__.py
 │       ├── config.py                    # Application configuration
@@ -410,12 +358,18 @@ Red:      #ef4444    /* Danger */
 │       │   └── suggestions.py           # AI suggestions
 │       └── utils/
 │           ├── __init__.py
+│           ├── auth.py                  # Authentication utilities
 │           └── csv_parser.py            # CSV parsing utilities
 ├── index.html                           # Main HTML file
 ├── package.json                         # Frontend dependencies
 ├── postcss.config.mjs                   # PostCSS configuration
+├── tsconfig.json                        # TypeScript configuration
 ├── vite.config.ts                       # Vite configuration
+├── .env.example                         # Frontend env template
+├── setup.sh                             # Linux/macOS setup script
+├── setup.bat                            # Windows setup script
 ├── ATTRIBUTIONS.md                      # Attributions
+├── AUTH_SETUP.md                        # Authentication setup guide
 ├── CSV_FORMAT_GUIDE.md                  # CSV format guide
 └── README.md                            # This file
 ```
@@ -492,8 +446,8 @@ POST /reports/export      - Export reports as CSV
 ## 🔮 Future Enhancements
 
 ### Planned Features
-- [ ] Real Google OAuth integration
-- [ ] Machine Learning classification
+- [x] Real Google OAuth integration (Supabase Auth)
+- [x] Machine Learning classification (Random Forest)
 - [ ] PDF report generation
 - [ ] Email notifications
 - [ ] Dark mode toggle
@@ -560,10 +514,8 @@ This project is for academic purposes. See [LICENSE](LICENSE) file for details.
 
 ## 👨‍💻 Author
 
-**Your Name**
-- College: [Your University]
-- Program: [Your Degree]
-- Year: [Academic Year]
+**Meet** — [@meet21122005](https://github.com/meet21122005)
+- Academic project demonstrating Data Science & Full-Stack Web Development
 
 ---
 
@@ -584,8 +536,8 @@ This project is for academic purposes. See [LICENSE](LICENSE) file for details.
 ## 💬 Support
 
 For questions or issues:
-- 📧 Email: your.email@university.edu
-- 💬 Issues: [GitHub Issues](https://github.com/meet21122005/-Fake-Productivity-Detector-Using-Data-Science-/issues)
+- � Issues: [GitHub Issues](https://github.com/meet21122005/-Fake-Productivity-Detector-Using-Data-Science-/issues)
+- 🐙 GitHub: [@meet21122005](https://github.com/meet21122005)
 
 ---
 

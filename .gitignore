@@ -51,11 +51,6 @@ dist/
 build/
 *.tsbuildinfo
 
-# ML Models
-backend/app/ml/models/
-*.joblib
-*.pkl
-
 # Database
 *.db
 *.sqlite
@@ -68,3 +63,8 @@ logs/
 # Temporary files
 tmp/
 temp/
+*.tmp
+*.csv.tmp
+
+# Uploaded CSV files (user data)
+uploads/

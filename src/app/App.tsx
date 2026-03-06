@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 import { LoginPage } from "./components/LoginPage";
 import { Sidebar, PageType } from "./components/Sidebar";
 import { DashboardPage } from "./components/pages/DashboardPage";
@@ -7,24 +8,28 @@ import { ManualAnalysisPage } from "./components/pages/ManualAnalysisPage";
 import { ReportsPage } from "./components/pages/ReportsPage";
 import { HistoryPage } from "./components/pages/HistoryPage";
 import { ProfilePage } from "./components/pages/ProfilePage";
+import { Loader2 } from "lucide-react";
 
-interface UserData {
-  name: string;
-  email: string;
-  photo: string;
-}
-
-export default function App() {
-  const [user, setUser] = useState<UserData | null>(null);
+function AppContent() {
+  const { user, loading, signOut } = useAuth();
   const [currentPage, setCurrentPage] = useState<PageType>("dashboard");
 
-  const handleLogin = (userData: UserData) => {
-    setUser(userData);
-    setCurrentPage("dashboard");
-  };
+  // Show loading spinner while session is being restored
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
+        <Loader2 className="w-10 h-10 animate-spin text-purple-600" />
+      </div>
+    );
+  }
 
-  const handleLogout = () => {
-    setUser(null);
+  // Not authenticated → show login
+  if (!user) {
+    return <LoginPage />;
+  }
+
+  const handleLogout = async () => {
+    await signOut();
     setCurrentPage("dashboard");
   };
 
@@ -32,9 +37,8 @@ export default function App() {
     setCurrentPage(page);
   };
 
-  if (!user) {
-    return <LoginPage onLogin={handleLogin} />;
-  }
+  // Map auth user to the shape components expect
+  const userData = { name: user.name, email: user.email, photo: user.photo };
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
@@ -54,14 +58,14 @@ export default function App() {
         userPhoto={user.photo}
       />
 
-      {/* Main Content */}
+      {/* Main Content — use Supabase user.id everywhere */}
       <div className="lg:ml-72 p-4 md:p-8 pt-20 lg:pt-8 relative z-10">
-        {currentPage === "dashboard" && <DashboardPage userId={user.name} />}
-        {currentPage === "upload" && <UploadCSVPage userId={user.name} userName={user.name} />}
-        {currentPage === "manual" && <ManualAnalysisPage userId={user.name} userName={user.name} />}
-        {currentPage === "reports" && <ReportsPage userId={user.name} />}
-        {currentPage === "history" && <HistoryPage userId={user.name} />}
-        {currentPage === "profile" && <ProfilePage user={user} />}
+        {currentPage === "dashboard" && <DashboardPage userId={user.id} />}
+        {currentPage === "upload" && <UploadCSVPage userId={user.id} userName={user.name} />}
+        {currentPage === "manual" && <ManualAnalysisPage userId={user.id} userName={user.name} />}
+        {currentPage === "reports" && <ReportsPage userId={user.id} />}
+        {currentPage === "history" && <HistoryPage userId={user.id} />}
+        {currentPage === "profile" && <ProfilePage user={userData} />}
       </div>
 
       <style>{`
@@ -81,5 +85,13 @@ export default function App() {
         }
       `}</style>
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }

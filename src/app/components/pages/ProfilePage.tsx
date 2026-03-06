@@ -2,7 +2,7 @@ import { motion } from "motion/react";
 import { User, Mail, Calendar, Award, BarChart3 } from "lucide-react";
 import { Activity } from "lucide-react";
 import { useEffect, useState } from "react";
-import { API_ENDPOINTS } from "../../config/api";
+import { API_ENDPOINTS, authFetch } from "../../config/api";
 
 interface UserData {
   name: string;
@@ -28,7 +28,7 @@ export function ProfilePage({ user }: ProfilePageProps) {
 
   const fetchUserStats = async () => {
     try {
-      const response = await fetch(API_ENDPOINTS.history(user.name));
+      const response = await authFetch(API_ENDPOINTS.history(user.name));
 
       if (response.ok) {
         const data = await response.json();

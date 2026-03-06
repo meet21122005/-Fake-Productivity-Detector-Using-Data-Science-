@@ -36,42 +36,66 @@ class Settings(BaseSettings):
     
     # Supabase Configuration
     supabase_url: str = Field(
-        default="https://iqdfsevjzfubmshlsxjr.supabase.co",
-        description="Supabase project URL"
+        default="",
+        description="Supabase project URL (set via SUPABASE_URL env var)"
     )
     supabase_key: str = Field(
-        default="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlxZGZzZXZqemZ1Ym1zaGxzeGpyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAxODYxNjIsImV4cCI6MjA4NTc2MjE2Mn0.xyM0ZY6H_KDbks0NXnmJ7reuKFhe_4FEFgTkACiZpmo",
-        description="Supabase anonymous key"
+        default="",
+        description="Supabase anonymous key (set via SUPABASE_KEY env var)"
     )
     supabase_service_key: Optional[str] = Field(
-        default="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlxZGZzZXZqemZ1Ym1zaGxzeGpyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MDE4NjE2MiwiZXhwIjoyMDg1NzYyMTYyfQ.rKtPk3TslSQ8RvPPFk_Mp_GLBOTbC6GTEPPs0aOzdbw",
-        description="Supabase service role key"
+        default=None,
+        description="Supabase service role key (set via SUPABASE_SERVICE_KEY env var)"
     )
     supabase_jwt_secret: Optional[str] = Field(
         default=None,
         description="Supabase JWT secret for token verification"
     )
     
-    # CORS Settings
-    cors_origins: list[str] = Field(
-        default=["http://localhost:5173", "http://localhost:3000", "*"],
-        description="Allowed CORS origins"
+    # CORS Settings  (stored as a comma-separated string in .env)
+    cors_origins_str: str = Field(
+        default="http://localhost:5173,http://localhost:3000,http://localhost:8080",
+        alias="CORS_ORIGINS",
+        description="Comma-separated list of allowed CORS origins"
     )
+
+    @property
+    def cors_origins(self) -> list[str]:
+        """Parse comma-separated CORS origins into a list."""
+        import json
+        raw = self.cors_origins_str
+        # Try JSON array first, then fall back to comma-split
+        try:
+            parsed = json.loads(raw)
+            if isinstance(parsed, list):
+                return parsed
+        except (json.JSONDecodeError, TypeError, ValueError):
+            pass
+        return [o.strip() for o in raw.split(",") if o.strip()]
     
     # Logging
     log_level: str = Field(default="INFO", description="Logging level")
     
-    # ML Model Paths
-    model_path: str = Field(default="app/ml/model.pkl", description="Path to trained ML model")
-    scaler_path: str = Field(default="app/ml/scaler.pkl", description="Path to feature scaler")
+    # ML Model Paths (resolved relative to this file's directory)
+    # Prefixed with ml_ to avoid Pydantic protected 'model_' namespace.
+    ml_model_path: str = Field(default="", description="Path to trained ML model (auto-resolved if empty)")
+    ml_scaler_path: str = Field(default="", description="Path to feature scaler (auto-resolved if empty)")
     
     # Rate Limiting
     rate_limit_requests: int = Field(default=100, description="Max requests per minute")
     
     class Config:
-        env_file = ".env"
+        # Load backend/.env relative to *this* file so the correct .env is
+        # used regardless of the working directory the server is started from.
+        env_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '.env')
         env_file_encoding = "utf-8"
         case_sensitive = False
+        # Ignore extra variables (e.g. VITE_* from the frontend .env) so
+        # Pydantic does not raise "Extra inputs are not permitted".
+        extra = "ignore"
+        # Allow 'model_path' style fields without Pydantic warning.
+        protected_namespaces = ("settings_",)
+        populate_by_name = True
 
 
 @lru_cache()
@@ -84,7 +108,14 @@ def get_settings() -> Settings:
     Returns:
         Settings: Application settings instance
     """
-    return Settings()
+    s = Settings()
+    # Resolve ML model paths relative to this file's location if not set
+    _app_dir = os.path.dirname(os.path.abspath(__file__))
+    if not s.ml_model_path:
+        s.ml_model_path = os.path.join(_app_dir, 'ml', 'models', 'random_forest_model.joblib')
+    if not s.ml_scaler_path:
+        s.ml_scaler_path = os.path.join(_app_dir, 'ml', 'scaler.pkl')
+    return s
 
 
 # Scoring Configuration

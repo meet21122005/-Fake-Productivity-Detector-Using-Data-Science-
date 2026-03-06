@@ -34,14 +34,20 @@ class SupabaseClient:
     _instance: Optional[Client] = None
     
     @classmethod
-    def get_client(cls) -> Client:
+    def get_client(cls) -> Optional[Client]:
         """
         Get or create Supabase client instance (singleton pattern).
         
         Returns:
-            Client: Supabase client instance
+            Client: Supabase client instance, or None if not configured
         """
         if cls._instance is None:
+            if not settings.supabase_url or not settings.supabase_key:
+                logger.warning(
+                    "Supabase URL/Key not configured. Using in-memory storage. "
+                    "Set SUPABASE_URL and SUPABASE_KEY environment variables."
+                )
+                return None
             try:
                 cls._instance = create_client(
                     settings.supabase_url,
@@ -50,7 +56,7 @@ class SupabaseClient:
                 logger.info("Supabase client initialized successfully")
             except Exception as e:
                 logger.error(f"Failed to initialize Supabase client: {e}")
-                raise
+                return None
         return cls._instance
     
     @classmethod
@@ -70,6 +76,7 @@ class ProductivityAnalysisDB:
         """Initialize with Supabase client."""
         self.client = SupabaseClient.get_client()
         self.table = TableNames.PRODUCTIVITY_ANALYSIS
+        self._use_memory = self.client is None
     
     async def create_analysis(
         self,
@@ -121,6 +128,9 @@ class ProductivityAnalysisDB:
                 "created_at": datetime.utcnow().isoformat()
             }
             
+            if self._use_memory:
+                return await self._fallback_create(record)
+            
             response = self.client.table(self.table).insert(record).execute()
             logger.info(f"Created analysis record for user {user_id}")
             return response.data[0] if response.data else record
@@ -165,6 +175,9 @@ class ProductivityAnalysisDB:
             List of analysis records
         """
         try:
+            if self._use_memory:
+                return await self._fallback_get_history(user_id)
+            
             response = self.client.table(self.table)\
                 .select("*")\
                 .eq("user_id", user_id)\
@@ -206,6 +219,9 @@ class ProductivityAnalysisDB:
             Number of deleted records
         """
         try:
+            if self._use_memory:
+                return await self._fallback_delete_history(user_id)
+            
             # Try main table first
             response = self.client.table(self.table)\
                 .delete()\
@@ -261,12 +277,22 @@ class ProductivityAnalysisDB:
                     "Fake Productivity": 0
                 },
                 "trend": 0,
-                "recent_analyses": []
+                "recent_analyses": [],
+                "avg_task_hours": 0,
+                "avg_tasks_completed": 0,
+                "avg_idle_hours": 0,
+                "avg_social_media_hours": 0,
+                "avg_break_frequency": 0
             }
-        
+
         scores = [h.get("productivity_score", h.get("score", 0)) for h in history]
         categories = [h.get("category_rule_based", h.get("category", "Unknown")) for h in history]
-        
+        task_hours = [h.get("task_hours", 0) for h in history]
+        tasks_completed = [h.get("tasks_completed", 0) for h in history]
+        idle_hours = [h.get("idle_hours", 0) for h in history]
+        social_media_hours = [h.get("social_media_usage", h.get("social_media_hours", 0)) for h in history]
+        break_frequency = [h.get("break_frequency", 0) for h in history]
+
         # Calculate trend (comparing recent vs older)
         if len(scores) >= 2:
             mid = len(scores) // 2
@@ -275,7 +301,10 @@ class ProductivityAnalysisDB:
             trend = recent_avg - older_avg
         else:
             trend = 0
-        
+
+        def safe_avg(lst):
+            return round(sum(lst) / len(lst), 2) if lst and any(x is not None for x in lst) else 0
+
         return {
             "total_analyses": len(history),
             "average_score": round(sum(scores) / len(scores), 2) if scores else 0,
@@ -287,7 +316,12 @@ class ProductivityAnalysisDB:
                 "Fake Productivity": categories.count("Fake Productivity")
             },
             "trend": round(trend, 2),
-            "recent_analyses": history[:10]
+            "recent_analyses": history[:10],
+            "avg_task_hours": safe_avg(task_hours),
+            "avg_tasks_completed": safe_avg(tasks_completed),
+            "avg_idle_hours": safe_avg(idle_hours),
+            "avg_social_media_hours": safe_avg(social_media_hours),
+            "avg_break_frequency": safe_avg(break_frequency)
         }
 
 

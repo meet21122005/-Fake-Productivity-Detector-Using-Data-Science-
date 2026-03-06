@@ -15,13 +15,20 @@ from typing import Optional
 import numpy as np
 import pandas as pd
 
-# Add parent directory to path for imports
+# Add parent directory to path for imports when running as script
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
-from ..services.ml_model import MLClassifier
-from ..services.preprocessing import DataPreprocessor
-from ..services.scoring import ProductivityScorer
-from ..config import ScoringConfig, ProductivityCategory
+try:
+    from app.services.ml_model import MLClassifier
+    from app.services.preprocessing import DataPreprocessor
+    from app.services.scoring import ProductivityScorer
+    from app.config import ScoringConfig, ProductivityCategory
+except ImportError:
+    from ..services.ml_model import MLClassifier
+    from ..services.preprocessing import DataPreprocessor
+    from ..services.scoring import ProductivityScorer
+    from ..config import ScoringConfig, ProductivityCategory
 
 logging.basicConfig(
     level=logging.INFO,
@@ -50,7 +57,7 @@ def generate_synthetic_data(n_samples: int = 1000, random_state: int = 42) -> pd
         'task_hours': [],
         'tasks_completed': [],
         'idle_hours': [],
-        'social_media_hours': [],
+        'social_media_usage': [],
         'break_frequency': []
     }
     
@@ -62,7 +69,7 @@ def generate_synthetic_data(n_samples: int = 1000, random_state: int = 42) -> pd
         data['task_hours'].append(np.random.uniform(6, 10))
         data['tasks_completed'].append(np.random.randint(5, 15))
         data['idle_hours'].append(np.random.uniform(0, 2))
-        data['social_media_hours'].append(np.random.uniform(0, 1.5))
+        data['social_media_usage'].append(np.random.uniform(0, 1.5))
         data['break_frequency'].append(np.random.randint(1, 4))
     
     # Moderately Productive profiles
@@ -70,7 +77,7 @@ def generate_synthetic_data(n_samples: int = 1000, random_state: int = 42) -> pd
         data['task_hours'].append(np.random.uniform(3, 6))
         data['tasks_completed'].append(np.random.randint(2, 8))
         data['idle_hours'].append(np.random.uniform(1, 4))
-        data['social_media_hours'].append(np.random.uniform(1, 3))
+        data['social_media_usage'].append(np.random.uniform(1, 3))
         data['break_frequency'].append(np.random.randint(3, 7))
     
     # Fake Productivity profiles
@@ -79,7 +86,7 @@ def generate_synthetic_data(n_samples: int = 1000, random_state: int = 42) -> pd
         data['task_hours'].append(np.random.uniform(0, 3))
         data['tasks_completed'].append(np.random.randint(0, 3))
         data['idle_hours'].append(np.random.uniform(3, 8))
-        data['social_media_hours'].append(np.random.uniform(2, 6))
+        data['social_media_usage'].append(np.random.uniform(2, 6))
         data['break_frequency'].append(np.random.randint(5, 12))
     
     df = pd.DataFrame(data)
@@ -94,9 +101,15 @@ def generate_synthetic_data(n_samples: int = 1000, random_state: int = 42) -> pd
     
     for _, row in df.iterrows():
         metrics = row.to_dict()
-        result = scorer.calculate_score(metrics)
-        scores.append(result['score'])
-        categories.append(result['category'])
+        result = scorer.calculate_score(
+            metrics["task_hours"],
+            metrics["idle_hours"],
+            metrics.get("social_media_usage", metrics.get("social_media_hours", 0)),
+            metrics["break_frequency"],
+            metrics["tasks_completed"]
+        )
+        scores.append(result.score)
+        categories.append(result.category)
     
     df['productivity_score'] = scores
     df['category'] = categories
@@ -124,7 +137,7 @@ def load_csv_data(filepath: str) -> pd.DataFrame:
     # Required columns
     required_cols = [
         'task_hours', 'tasks_completed', 'idle_hours',
-        'social_media_hours', 'break_frequency'
+        'social_media_usage', 'break_frequency'
     ]
     
     # Check for required columns (case-insensitive)
@@ -142,9 +155,15 @@ def load_csv_data(filepath: str) -> pd.DataFrame:
         
         for _, row in df.iterrows():
             metrics = {col: row[col] for col in required_cols}
-            result = scorer.calculate_score(metrics)
-            scores.append(result['score'])
-            categories.append(result['category'])
+            result = scorer.calculate_score(
+                metrics["task_hours"],
+                metrics["idle_hours"],
+                metrics.get("social_media_usage", metrics.get("social_media_hours", 0)),
+                metrics["break_frequency"],
+                metrics["tasks_completed"]
+            )
+            scores.append(result.score)
+            categories.append(result.category)
         
         df['productivity_score'] = scores
         df['category'] = categories
@@ -177,12 +196,12 @@ def train_and_evaluate(
     
     # Preprocess data
     preprocessor = DataPreprocessor()
-    processed_df = preprocessor.preprocess(data)
+    processed_df = preprocessor.clean_data(data)
     
     # Feature columns
     feature_cols = [
         'task_hours', 'tasks_completed', 'idle_hours',
-        'social_media_hours', 'break_frequency'
+        'social_media_usage', 'break_frequency'
     ]
     
     # Prepare features and labels
@@ -244,12 +263,12 @@ def compare_models(data: pd.DataFrame, model_dir: str = 'models') -> dict:
     
     # Preprocess data
     preprocessor = DataPreprocessor()
-    processed_df = preprocessor.preprocess(data)
+    processed_df = preprocessor.clean_data(data)
     
     # Feature columns
     feature_cols = [
         'task_hours', 'tasks_completed', 'idle_hours',
-        'social_media_hours', 'break_frequency'
+        'social_media_usage', 'break_frequency'
     ]
     
     X = processed_df[feature_cols].values

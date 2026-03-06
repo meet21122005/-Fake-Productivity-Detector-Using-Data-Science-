@@ -10,7 +10,7 @@ import {
   Menu,
   X
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export type PageType = "dashboard" | "upload" | "manual" | "reports" | "history" | "profile";
 
@@ -25,6 +25,14 @@ interface SidebarProps {
 export function Sidebar({ currentPage, onPageChange, onLogout, userName, userPhoto }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
+
+  useEffect(() => {
+    const checkDesktop = () => setIsDesktop(window.innerWidth >= 1024);
+    checkDesktop();
+    window.addEventListener("resize", checkDesktop);
+    return () => window.removeEventListener("resize", checkDesktop);
+  }, []);
 
   const menuItems = [
     { id: "dashboard" as PageType, label: "Dashboard", icon: LayoutDashboard },
@@ -52,7 +60,7 @@ export function Sidebar({ currentPage, onPageChange, onLogout, userName, userPho
 
       {/* Sidebar */}
       <AnimatePresence>
-        {(isMobileOpen || window.innerWidth >= 1024) && (
+        {(isMobileOpen || isDesktop) && (
           <motion.div
             initial={{ x: -300, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}

@@ -3,7 +3,7 @@ import { motion } from "motion/react";
 import { ActivityInput } from "../ActivityInput";
 import { ProductivityResults } from "../ProductivityResults";
 import { ProductivityAnalysis, ActivityData } from "../Dashboard";
-import { API_ENDPOINTS } from "../../config/api";
+import { API_ENDPOINTS, authFetch } from "../../config/api";
 
 interface ManualAnalysisPageProps {
   userId: string;
@@ -83,7 +83,7 @@ export function ManualAnalysisPage({ userId, userName }: ManualAnalysisPageProps
 
     // Save to backend
     try {
-      await fetch(API_ENDPOINTS.analyze, {
+      await authFetch(API_ENDPOINTS.analyze, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

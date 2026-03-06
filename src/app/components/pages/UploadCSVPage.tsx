@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Upload, FileText, CheckCircle, AlertCircle, Download, Trash2 } from "lucide-react";
-import { API_ENDPOINTS } from "../../config/api";
+import { API_ENDPOINTS, authFetch } from "../../config/api";
 import { CSVTemplateDownload } from "./CSVTemplate";
 
 interface CSVAnalysisResult {
@@ -87,7 +87,7 @@ export function UploadCSVPage({ userId, userName }: UploadCSVPageProps) {
       formData.append("user_id", userId);
       formData.append("user_name", userName);
 
-      const response = await fetch(API_ENDPOINTS.uploadCsv, {
+      const response = await authFetch(API_ENDPOINTS.uploadCsv, {
         method: "POST",
         body: formData,
       });

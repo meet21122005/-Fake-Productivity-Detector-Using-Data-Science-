@@ -191,6 +191,12 @@ class CSVParser:
         """
         df = df.copy()
         
+        # Sanitize string columns against CSV injection
+        for col in df.select_dtypes(include=['object']).columns:
+            df[col] = df[col].apply(
+                lambda x: x.lstrip("=+-@\t\r") if isinstance(x, str) else x
+            )
+        
         # Define default values for missing columns
         defaults = {
             'task_hours': 0.0,

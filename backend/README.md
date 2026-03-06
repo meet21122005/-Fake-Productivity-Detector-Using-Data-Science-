@@ -103,38 +103,64 @@ backend/
 - pip or conda
 - Supabase project (free tier works)
 
-### Installation
+---
 
-1. **Navigate to backend directory**
-   ```powershell
-   cd backend
-   ```
+### Installation (Recommended: Conda)
 
-2. **Create virtual environment**
-   ```powershell
-   python -m venv venv
-   .\venv\Scripts\Activate.ps1
-   ```
+**If you are on Windows and see errors about building `pandas` or `numpy`, use this method!**
 
-3. **Install dependencies**
-   ```powershell
-   pip install -r requirements.txt
-   ```
+1. Install [Miniconda](https://docs.conda.io/en/latest/miniconda.html) or [Anaconda](https://www.anaconda.com/products/distribution).
+2. In the project root, run:
+  ```powershell
+  conda env create -f environment.yml
+  conda activate fpd-env
+  cd backend
+  python -m app.main
+  ```
 
-4. **Configure environment**
-   ```powershell
-   cp .env.example .env
-   # Edit .env with your Supabase credentials
-   ```
+---
 
-5. **Run the server**
-   ```powershell
-   uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-   ```
+### Alternative: venv + pip (Windows, requires C++ Build Tools)
 
-6. **Open API documentation**
-   - Swagger UI: http://localhost:8000/docs
-   - ReDoc: http://localhost:8000/redoc
+1. Install [Build Tools for Visual Studio](https://aka.ms/vs/17/release/vs_BuildTools.exe)
+  - Select "Desktop development with C++" workload during install.
+2. In the backend folder, run:
+  ```powershell
+  python -m venv .venv
+  .\.venv\Scripts\Activate.ps1
+  python -m pip install --upgrade pip
+  python -m pip install -r requirements.txt
+  python -m app.main
+  ```
+
+---
+
+### Common Troubleshooting
+
+- **Build errors for pandas/numpy/scikit-learn:**
+  - Use the Conda method above for a smoother experience.
+  - If you must use pip, ensure you have the Visual Studio Build Tools installed (see above).
+
+---
+
+### Configure environment
+```powershell
+cp .env.example .env
+# Edit .env with your Supabase credentials
+```
+
+---
+
+### Run the server
+```powershell
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+---
+
+### Open API documentation
+- Swagger UI: http://localhost:8000/docs
+- ReDoc: http://localhost:8000/redoc
 
 ### Train ML Model (Optional)
 
