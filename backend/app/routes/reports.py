@@ -440,7 +440,7 @@ async def export_csv(
                 record.get('task_hours', ''),
                 record.get('tasks_completed', ''),
                 record.get('idle_hours', ''),
-                record.get('social_media_hours', ''),
+                record.get('social_media_usage', record.get('social_media_hours', '')),
                 record.get('break_frequency', '')
             ])
         

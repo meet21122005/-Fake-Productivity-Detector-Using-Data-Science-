@@ -68,3 +68,9 @@ logs/
 # Temporary files
 tmp/
 temp/
+*.tmp
+*.csv.tmp
+RUN.TXT
+
+# Uploaded CSV files (user data)
+uploads/

@@ -1,14 +1,28 @@
-# Dockerfile to run training in a reproducible container
+# Dockerfile to run the backend in a reproducible container
 FROM python:3.11-slim
 WORKDIR /app
-# system build deps for wheels
+
+# System build deps for native wheels
 RUN apt-get update && \
-    apt-get install -y build-essential gcc libpq-dev && \
+    apt-get install -y --no-install-recommends build-essential gcc libpq-dev && \
     rm -rf /var/lib/apt/lists/*
-COPY backend/requirements.txt /app/requirements.txt
-RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
-COPY . /app
+
+# Install Python dependencies first (better layer caching)
+COPY backend/requirements.txt /app/backend/requirements.txt
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir -r /app/backend/requirements.txt
+
+# Copy application code
+COPY backend/ /app/backend/
+
 WORKDIR /app/backend
-# Default: run the official training entrypoint
-CMD ["python", "-m", "app.ml.train_model"]
+
+# Train ML model if not present (uses synthetic data)
+RUN python -m app.ml.train_model --output-dir app/ml/models || \
+    echo "Warning: ML model training skipped (non-critical)"
+
+# Expose API port
+EXPOSE 8000
+
+# Default: run the API server
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

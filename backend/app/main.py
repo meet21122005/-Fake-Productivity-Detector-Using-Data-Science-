@@ -50,7 +50,7 @@ async def lifespan(app: FastAPI):
     logger.info(f"Supabase URL: {settings.supabase_url}")
     logger.info(f"Debug Mode: {settings.debug}")
     
-    # Check for ML model availability
+    # Check for ML model availability; auto-train if missing
     model_path = os.path.join(os.path.dirname(__file__), 'ml', 'models', 'random_forest_model.joblib')
     if os.path.exists(model_path):
         logger.info(f"ML Model found: {model_path}")
@@ -62,7 +62,16 @@ async def lifespan(app: FastAPI):
         except Exception as e:
             logger.warning(f"Could not load model info: {e}")
     else:
-        logger.warning("No pre-trained ML model found. ML predictions will use default model.")
+        logger.warning("No pre-trained ML model found. Auto-training with synthetic data...")
+        try:
+            from app.ml.train_model import generate_synthetic_data, train_and_evaluate
+            model_dir = os.path.join(os.path.dirname(__file__), 'ml', 'models')
+            data = generate_synthetic_data(n_samples=1000)
+            results = train_and_evaluate(data, model_type='random_forest', model_dir=model_dir)
+            logger.info(f"Auto-trained model saved. Accuracy: {results['test_accuracy']:.4f}")
+        except Exception as e:
+            logger.error(f"Auto-training failed (non-critical): {e}")
+            logger.info("The API will still work — ML predictions will use an untrained model.")
     
     yield
     
@@ -205,8 +214,8 @@ async def api_info():
             }
         },
         "endpoints": {
-            "analysis": "/api/v1/analysis",
-            "csv_upload": "/api/v1/csv",
+            "analysis": "/api/v1/analyze",
+            "csv_upload": "/api/v1/upload-csv",
             "history": "/api/v1/history",
             "reports": "/api/v1/reports"
         }
@@ -240,7 +249,7 @@ if __name__ == "__main__":
     import uvicorn
     
     uvicorn.run(
-        app,
+        "app.main:app",          # import string required for --reload
         host="127.0.0.1",
         port=8000,
         reload=settings.debug,

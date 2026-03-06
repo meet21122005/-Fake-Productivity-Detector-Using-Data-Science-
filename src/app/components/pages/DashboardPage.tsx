@@ -16,7 +16,7 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
-import { API_ENDPOINTS } from "../../config/api";
+import { API_ENDPOINTS, authFetch } from "../../config/api";
 
 interface DashboardStats {
   totalAnalyses: number;
@@ -46,7 +46,7 @@ export function DashboardPage({ userId }: DashboardPageProps) {
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      const response = await fetch(API_ENDPOINTS.history(userId));
+      const response = await authFetch(API_ENDPOINTS.history(userId));
 
       if (response.ok) {
         const data = await response.json();

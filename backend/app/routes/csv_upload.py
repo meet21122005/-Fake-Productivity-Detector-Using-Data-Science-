@@ -216,16 +216,7 @@ async def upload_csv(
                     "Highly Productive": 0,
                     "Moderately Productive": 0,
                     "Fake Productivity": 0
-                },
-                suggestions=suggestion_engine.generate_suggestions(
-                    task_hours=0,
-                    idle_hours=0,
-                    social_media_usage=0,
-                    break_frequency=0,
-                    tasks_completed=0,
-                    score=0,
-                    max_suggestions=3
-                )
+                }
             )
         return BatchAnalysisResult(
             total_rows=len(rows),

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { FileText, Download, Filter, Calendar, TrendingUp, TrendingDown } from "lucide-react";
-import { API_ENDPOINTS } from "../../config/api";
+import { API_ENDPOINTS, authFetch } from "../../config/api";
 
 interface Report {
   timestamp: string;
@@ -35,7 +35,7 @@ export function ReportsPage({ userId }: ReportsPageProps) {
     try {
       setLoading(true);
       // Fetch detailed reports for table
-      const historyRes = await fetch(API_ENDPOINTS.history(userId));
+      const historyRes = await authFetch(API_ENDPOINTS.history(userId));
       let mappedReports: Report[] = [];
       if (historyRes.ok) {
         const data = await historyRes.json();
@@ -54,7 +54,7 @@ export function ReportsPage({ userId }: ReportsPageProps) {
       }
 
       // Fetch stats from /reports endpoint
-      const statsRes = await fetch(API_ENDPOINTS.reports(userId));
+      const statsRes = await authFetch(API_ENDPOINTS.reports(userId));
       if (statsRes.ok) {
         const statsData = await statsRes.json();
         setStats({

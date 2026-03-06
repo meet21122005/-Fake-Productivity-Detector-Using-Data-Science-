@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { History, TrendingUp, TrendingDown, Trash2, Calendar } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { API_ENDPOINTS } from "../config/api";
+import { API_ENDPOINTS, authFetch } from "../config/api";
 
 interface HistoryEntry {
   userId: string;
@@ -29,7 +29,7 @@ export function ProductivityHistory({ userId }: ProductivityHistoryProps) {
   const fetchHistory = async () => {
     try {
       setLoading(true);
-      const response = await fetch(API_ENDPOINTS.history(userId));
+      const response = await authFetch(API_ENDPOINTS.history(userId));
 
       if (!response.ok) {
         throw new Error("Failed to fetch history");
@@ -68,7 +68,7 @@ export function ProductivityHistory({ userId }: ProductivityHistoryProps) {
     }
 
     try {
-      const response = await fetch(API_ENDPOINTS.history(userId), {
+      const response = await authFetch(API_ENDPOINTS.history(userId), {
         method: "DELETE",
       });
 

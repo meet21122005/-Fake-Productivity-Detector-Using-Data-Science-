@@ -65,7 +65,7 @@ class MLClassifier:
             model_path: Path to saved model file
         """
         self.model_type = model_type
-        self.model_path = model_path or settings.model_path
+        self.model_path = model_path or settings.ml_model_path
         self.model = None
         self.is_trained = False
         self.training_accuracy = 0.0

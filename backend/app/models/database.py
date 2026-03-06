@@ -34,14 +34,20 @@ class SupabaseClient:
     _instance: Optional[Client] = None
     
     @classmethod
-    def get_client(cls) -> Client:
+    def get_client(cls) -> Optional[Client]:
         """
         Get or create Supabase client instance (singleton pattern).
         
         Returns:
-            Client: Supabase client instance
+            Client: Supabase client instance, or None if not configured
         """
         if cls._instance is None:
+            if not settings.supabase_url or not settings.supabase_key:
+                logger.warning(
+                    "Supabase URL/Key not configured. Using in-memory storage. "
+                    "Set SUPABASE_URL and SUPABASE_KEY environment variables."
+                )
+                return None
             try:
                 cls._instance = create_client(
                     settings.supabase_url,
@@ -50,7 +56,7 @@ class SupabaseClient:
                 logger.info("Supabase client initialized successfully")
             except Exception as e:
                 logger.error(f"Failed to initialize Supabase client: {e}")
-                raise
+                return None
         return cls._instance
     
     @classmethod
@@ -70,6 +76,7 @@ class ProductivityAnalysisDB:
         """Initialize with Supabase client."""
         self.client = SupabaseClient.get_client()
         self.table = TableNames.PRODUCTIVITY_ANALYSIS
+        self._use_memory = self.client is None
     
     async def create_analysis(
         self,
@@ -121,6 +128,9 @@ class ProductivityAnalysisDB:
                 "created_at": datetime.utcnow().isoformat()
             }
             
+            if self._use_memory:
+                return await self._fallback_create(record)
+            
             response = self.client.table(self.table).insert(record).execute()
             logger.info(f"Created analysis record for user {user_id}")
             return response.data[0] if response.data else record
@@ -165,6 +175,9 @@ class ProductivityAnalysisDB:
             List of analysis records
         """
         try:
+            if self._use_memory:
+                return await self._fallback_get_history(user_id)
+            
             response = self.client.table(self.table)\
                 .select("*")\
                 .eq("user_id", user_id)\
@@ -206,6 +219,9 @@ class ProductivityAnalysisDB:
             Number of deleted records
         """
         try:
+            if self._use_memory:
+                return await self._fallback_delete_history(user_id)
+            
             # Try main table first
             response = self.client.table(self.table)\
                 .delete()\
